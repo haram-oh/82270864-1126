@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-app  # Deployment 이름 수정
+  namespace: argocd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: springboot-app
+  template:
+    metadata:
+      labels:
+        app: springboot-app
+    spec:
+      containers:
+      - name: springboot-app
+        image: cepgbaseacr.azurecr.io/springboot-app:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: app-storage
+          mountPath: /data  # 애플리케이션에서 사용할 디렉토리
+      volumes:
+      - name: app-storage
+        persistentVolumeClaim:
+          claimName: springboot-app-pvc  # PVC 이름과 연결

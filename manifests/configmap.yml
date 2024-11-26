@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: springboot-app-config  # ConfigMap 이름 수정
+  namespace: argocd
+data:
+  application.properties: |
+    # Spring Boot 애플리케이션의 프로퍼티 설정
+    server.port=8080

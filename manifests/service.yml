@@ -1,28 +1,13 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Service
 metadata:
-  name: my-spring-boot-service
-  namespace: default
+  name: springboot-app
+  namespace: argocd
 spec:
-  replicas: 1
   selector:
-    matchLabels:
-      app: my-spring-boot-app
-  template:
-    metadata:
-      labels:
-        app: my-spring-boot-app
-    spec:
-      containers:
-      - name: my-spring-boot-app
-        image: cepgbaseacr.azurecr.io/my-spring-boot-app:latest
-        ports:
-        - containerPort: 8080
-        volumeMounts:
-        - name: app-storage
-          mountPath: /data
-      volumes:
-      - name: app-storage
-        persistentVolumeClaim:
-          claimName: app-pvc 
-
+    app: springboot-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
