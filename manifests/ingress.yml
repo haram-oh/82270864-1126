@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: springboot-app.cepg-82270864-sa.kubepia.net
+    - host: springboot-app.ce-82270864-sa.kubepia.net
       http:
         paths:
           - path: /
