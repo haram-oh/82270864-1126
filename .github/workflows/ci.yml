@@ -1,9 +1,6 @@
-name: GitHub Actions CI/CD
+name: github action CI
 
-on:
-  push:
-    branches:
-      - main
+on: workflow_dispatch
 
 env:
   IMAGE_NAME: cloud-sample
@@ -13,10 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.REPO_TOKEN }}
-        
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -32,40 +28,41 @@ jobs:
 
     - name: Generate Version
       id: gen-version
-      run: |
-        echo "::set-output name=VERSION::`date +%Y%m%d%H%M`"
-        
-    - name: Login to Base ACR
+      run: echo "VERSION=$(date +%Y%m%d%H%M)" >> $GITHUB_ENV
+
+    - name: ACR Login - Base ACR
       uses: azure/docker-login@v1
       with:
-        login-server: ${{ secrets.BASEACR_LOGIN_SERVER }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        login-server: cepgbaseacr.azurecr.io
+        username: ${{ secrets.ACR_USERNAME_BASE }}
+        password: ${{ secrets.ACR_PASSWORD_BASE }}
 
-    - name: Build and Tag Docker Image
+    - name: Build & Tag Docker Image
       run: |
-        docker build -t ${{ secrets.BASEACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ steps.gen-version.outputs.VERSION }} -f Dockerfile-maven .
-        docker tag ${{ secrets.BASEACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ steps.gen-version.outputs.VERSION }} ${{ secrets.STAPACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ steps.gen-version.outputs.VERSION }}
+        docker build -t cepgbaseacr.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.VERSION }} -f Dockerfile-maven .
+        docker tag cepgbaseacr.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.VERSION }} ce82270864acr.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
 
-    - name: Push Image to Target ACR
+    - name: ACR Login - Target ACR
       uses: azure/docker-login@v1
       with:
-        login-server: ${{ secrets.STAPACR_LOGIN_SERVER }}
-        username: ${{ secrets.REGISTRY_USERNAME }}
-        password: ${{ secrets.REGISTRY_PASSWORD }}
+        login-server: ce82270864acr.azurecr.io
+        username: ${{ secrets.ACR_USERNAME_TARGET }}
+        password: ${{ secrets.ACR_PASSWORD_TARGET }}
+
+    - name: Push Image
       run: |
-        docker push ${{ secrets.STAPACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ steps.gen-version.outputs.VERSION }}
+        docker push ce82270864acr.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
 
     - name: Update Kubernetes Resources
       run: |
         cd manifests/overlays/prod
-        kustomize edit set image ${{ secrets.STAPACR_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ steps.gen-version.outputs.VERSION }}
+        kustomize edit set image ce82270864acr.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
         cat kustomization.yaml
 
     - name: Commit and Push Updates
       run: |
-        cd manifests
-        git pull --rebase origin main
-        git add .
-        git commit -m "Update image tag: ${{ steps.gen-version.outputs.VERSION }}"
+        git config --global user.email "rkwhk7203@naver.com"
+        git config --global user.name "haram-oh"
+        git add manifests/overlays/prod/kustomization.yaml
+        git commit -m "Update image tag to ${{ env.VERSION }}" || echo "No changes to commit"
         git push origin main
