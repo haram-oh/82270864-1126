@@ -39,7 +39,7 @@ jobs:
 
     - name: Build & Tag Docker Image
       run: |
-        docker build -t cepgbaseacr.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.VERSION }} -f Dockerfile-maven .
+        docker build -t cepgbaseacr.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.VERSION }} -f Dockerfile .
         docker tag cepgbaseacr.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.VERSION }} ce82270864acr.azurecr.io/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
 
     - name: ACR Login - Target ACR
