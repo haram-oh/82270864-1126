@@ -20,7 +20,7 @@ spec:
         - containerPort: 8080
         volumeMounts:
         - name: app-storage
-          mountPath: /mnt/cloud-sample  # 애플리케이션에서 사용할 디렉토리
+          mountPath: /data  # 애플리케이션에서 사용할 디렉토리
       volumes:
       - name: app-storage
         persistentVolumeClaim:
