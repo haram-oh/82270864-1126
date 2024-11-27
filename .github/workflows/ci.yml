@@ -13,14 +13,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Login to Azure Container Registry (Source ACR: cepgbaseacr)
+    - name: Login to Azure Container Registry (Source ACR:cepgbaseacr)
       uses: azure/docker-login@v1
       with:
         login-server: cepgbaseacr.azurecr.io
         username: ${{ secrets.ACR_USERNAME_BASE }}
         password: ${{ secrets.ACR_PASSWORD_BASE }}
 
-    - name: Login to Azure Container Registry (Target ACR: ce82270864acr)
+    - name: Login to Azure Container Registry (Target ACR:ce82270864acr)
       uses: azure/docker-login@v1
       with:
         login-server: ce82270864acr.azurecr.io
