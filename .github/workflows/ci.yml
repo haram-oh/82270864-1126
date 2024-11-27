@@ -3,7 +3,7 @@ name: github action CI
 on: workflow_dispatch
 
 env:
-  IMAGE_NAME: cloud-sample
+  IMAGE_NAME: springboot-app
 
 jobs:
   build:
@@ -16,14 +16,14 @@ jobs:
     - name: Login to Azure Container Registry (ACR)
       uses: azure/docker-login@v1
       with:
-        login-server: cepgbaseacr.azurecr.io
+        login-server: ce82270864acr.azurecr.io
         username: ${{ secrets.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
 
     - name: Build Docker Image
       run: |
-        docker build -t cepgbaseacr.azurecr.io/${{ env.IMAGE_NAME }}:latest .
+        docker build -t ce82270864acr.azurecr.io/${{ env.IMAGE_NAME }}:latest .
     
     - name: Push Docker Image
       run: |
-        docker push cepgbaseacr.azurecr.io/${{ env.IMAGE_NAME }}:latest
+        docker push ce82270864acr.azurecr.io/${{ env.IMAGE_NAME }}:latest
