@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: springboot-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/haram-oh/82270864-1126  # GitHub Repository URL
+    targetRevision: main  # GitHub 브랜치
+    path: manifests/overlays/prod  # Kubernetes 리소스가 있는 경로
+  destination:
+    server: https://kubernetes.default.svc  # Kubernetes API 서버
+    namespace: argocd  # 애플리케이션 배포 네임스페이스
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
