@@ -62,7 +62,7 @@ jobs:
     - name: Commit and Push Updates
       run: |
         git config --global user.email "rkwhk7203@naver.com"
-        git config --global user.name "haram-oh"
+        git config --global user.name "haram"
         git add manifests/overlays/prod/kustomization.yaml
         git commit -m "Update image tag to ${{ env.VERSION }}" || echo "No changes to commit"
         git push origin main
